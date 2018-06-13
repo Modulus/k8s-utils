@@ -1,27 +1,29 @@
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  namespace: deployment
+  namespace: jenkins
   name: deployment-role
 rules:
 - apiGroups: [""] # "" indicates the core API group
   resources: ["pods"]
   verbs: ["get", "list"]
 - apiGroups: [""] # "" indicates the core API group
-  resources: ["deployment"]
+  resources: ["deployments"]
   verbs: ["get", "list", "create", "apply"]
-
+- apiGroups: ["extensions"]
+  resources: ["deployments"]
+  verbs: ["get", "list"]
 ---
 
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: deployment-role-binding
-  namespace: deployment
+  namespace: jenkins
 subjects:
 - kind: ServiceAccount
-  name: deployment # Name is case sensitive
-  namespace: deployment
+  name: jenkins # Name is case sensitive
+  namespace: jenkins
 roleRef:
   kind: Role #this must be Role or ClusterRole
   name: deployment-role # this must match the name of the Role or ClusterRole you wish to bind to

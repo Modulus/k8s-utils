@@ -7,6 +7,7 @@ if [[ -z "$1" ]] || [[ -z "$2" ]]; then
  echo "usage: $0 <service_account_name> <namespace>"
  exit 1
 fi
+  
 
 SERVICE_ACCOUNT_NAME=$1
 NAMESPACE="$2"
@@ -27,21 +28,21 @@ create_service_account() {
 
 get_secret_name_from_service_account() {
     echo -e "\\nGetting secret of service account ${SERVICE_ACCOUNT_NAME}-${NAMESPACE}"
-    SECRET_NAME=$(kubectl get sa deployment -n ${NAMESPACE} -o jsonpath="{.secrets[0].name}")
+    SECRET_NAME=$(kubectl get sa ${SERVICE_ACCOUNT_NAME} -n ${NAMESPACE} -o jsonpath="{.secrets[0].name}")
     echo "Secret name: ${SECRET_NAME}"
 }
 
 extract_ca_crt_from_secret() {
     echo -e -n "\\nExtracting ca.crt from secret..."
     kubectl get secret "${SECRET_NAME}" -n  "${NAMESPACE}" -o jsonpath="{.data.ca\.crt}" \
-    | base64 -d > "${TARGET_FOLDER}/ca.crt"
+    | base64 -D > "${TARGET_FOLDER}/ca.crt"
     printf "done"
 }
 
 get_user_token_from_secret() {
     echo -e -n "\\nGetting user token from secret..."
     USER_TOKEN=$(kubectl get secret ${SECRET_NAME} -n "${NAMESPACE}"  \
-    -o jsonpath="{.data.token}" | base64 -d)
+    -o jsonpath="{.data.token}" | base64 -D)
     printf "done"
 }
 
